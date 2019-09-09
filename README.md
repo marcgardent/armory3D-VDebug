@@ -12,8 +12,8 @@ Library to debug in `Armory3D` / `Iron`. You can draw your debug infos on the sc
 
 ## Usage
 
-* enable `arm_debug` flag and `import vdebug.VDebug`
-* call `vdebug.VDebug.*` in the main loop  `Update`, `LateUpdate`
+* enable `arm_debug` flag
+* call `vdebug.VDebug.*`
 
 ```haxe
 package arm;
