@@ -1,13 +1,13 @@
 
 # VDebug
 
-Feature to debug in `Armory3D` / `Iron`. You can draw your debug infos on the screen like a `logger`.
+Library to debug in `Armory3D` / `Iron`. You can draw your debug infos on the screen like a `logger`.
 
 ## Installation
 
 - Locate the `.blend` file you are working with
 - Create `Libraries` folder alongside your `.blend` file
-- Clone this repository using `git clone https://github.com/armory3d/logic_pack` into `Libraries` folder
+- Clone this repository using `git clone https://github.com/armory3d/armory3D-VDebug` into `Libraries` folder
 - Restart Blender and load your `.blend`
 
 ## Usage
