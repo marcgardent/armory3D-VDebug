@@ -7,13 +7,15 @@ import kha.System;
 import iron.math.Vec4;
 
 using kha.graphics2.GraphicsExtension;
-import kha.Assets;
 
+import kha.Assets;
 
 class VDebugImpl extends iron.Trait implements IVDebug {
 	private var lines:Array<LineVDebug> = new Array<LineVDebug>();
 	private var points:Array<PointVDebug> = new Array<PointVDebug>();
+	private var drags:Map<String, Array<PointVDebug>> = new Map<String, Array<PointVDebug>>();
 	private var messages:Array<String> = new Array<String>();
+	
 	private var drawTextCall:(g:kha.graphics2.Graphics) -> Void;
 
 	public static var x(default, null):Int;
@@ -40,6 +42,26 @@ class VDebugImpl extends iron.Trait implements IVDebug {
 		this.lines.push(line);
 	}
 
+	public function addDrag(a:Vec4, color:Color, strength:Float, id:String, buffersize:Int) {
+		var d:Array<PointVDebug>;
+		if (this.drags.exists(id)) {
+			d = this.drags.get(id);
+		} else {
+			d = new Array<PointVDebug>();
+			this.drags.set(id, d);
+		}
+
+		if (d.length > buffersize) {
+			d.shift();
+		}
+
+		var point = new PointVDebug();
+		point.a = a.clone();
+		point.color = color;
+		point.strength = strength;
+		d.push(point);
+	}
+
 	public function addPoint(a:Vec4, color:Color, strength:Float) {
 		var point = new PointVDebug();
 		point.a = a.clone();
@@ -51,12 +73,22 @@ class VDebugImpl extends iron.Trait implements IVDebug {
 	public function addVariable(key:String, value:String):Void {
 		this.messages.push(key + ": " + value);
 	}
-	
+
 	public function addMessage(message:String):Void {
 		this.messages.push(message);
 	}
 
 	public function onRender(g:kha.graphics2.Graphics) {
+
+		for (i in this.drags.keys()) {
+			for (point in this.drags[i]) {
+				var aScreen = WorldToScreen(point.a);
+				g.color = point.color;
+				GraphicsExtension.fillCircle(g, aScreen.x, aScreen.y, point.strength);
+			}
+			//this.drags[i].shift();
+		}
+
 		while (this.lines.length > 0) {
 			var line = this.lines.pop();
 			if (line.a != null && line.b != null) {
