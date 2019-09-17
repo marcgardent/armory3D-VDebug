@@ -34,10 +34,10 @@ class DebugTrait extends iron.Trait {
 			var dest = new Vec4(0,0,10);
 			var level = 10;
 			#if arm_debug
-			VDebug.addLine(source, dest, Color.Red, 1);
-			VDebug.addPoint(source, Color.Blue, 5);
-			VDebug.addMessage("my message");
-			VDebug.addVariable("level", level);
+			VDebug.line(source, dest, Color.Red, 1);
+			VDebug.point(source, Color.Blue, 5);
+			VDebug.message("my message");
+			VDebug.variable("level", level);
 			#end
 		});
 	}

@@ -2,6 +2,7 @@ package vdebug;
 
 #if arm_debug
 import iron.math.Vec2;
+import iron.App;
 import kha.Color;
 import kha.System;
 import iron.math.Vec4;
@@ -13,9 +14,10 @@ import kha.Assets;
 class VDebugImpl extends iron.Trait implements IVDebug {
 	private var lines:Array<LineVDebug> = new Array<LineVDebug>();
 	private var points:Array<PointVDebug> = new Array<PointVDebug>();
-	private var drags:Map<String, Array<PointVDebug>> = new Map<String, Array<PointVDebug>>();
+	private var trails:Map<String, Array<PointVDebug>> = new Map<String, Array<PointVDebug>>();
+	private var stopwatches:Map<String, StopwatchVDebug> = new Map<String, StopwatchVDebug>();
+	private var costs:Map<String, Float> = new Map<String, Float>();
 	private var messages:Array<String> = new Array<String>();
-	
 	private var drawTextCall:(g:kha.graphics2.Graphics) -> Void;
 
 	public static var x(default, null):Int;
@@ -25,6 +27,7 @@ class VDebugImpl extends iron.Trait implements IVDebug {
 		this.drawTextCall = function(g:kha.graphics2.Graphics) {};
 		this.notifyOnRender2D(this.onRender);
 		Assets.loadEverything(loadingFinished);
+		App.notifyOnRender2D(this.onRender);
 	}
 
 	public function loadingFinished() {
@@ -33,7 +36,7 @@ class VDebugImpl extends iron.Trait implements IVDebug {
 		this.drawTextCall = this.drawText;
 	}
 
-	public function addLine(a:Vec4, b:Vec4, color:Color, strength:Float) {
+	public function line(a:Vec4, b:Vec4, color:Color, strength:Float) {
 		var line = new LineVDebug();
 		line.a = a.clone();
 		line.b = b.clone();
@@ -42,13 +45,13 @@ class VDebugImpl extends iron.Trait implements IVDebug {
 		this.lines.push(line);
 	}
 
-	public function addDrag(a:Vec4, color:Color, strength:Float, id:String, buffersize:Int) {
+	public function trail(a:Vec4, color:Color, strength:Float, id:String, buffersize:Int) {
 		var d:Array<PointVDebug>;
-		if (this.drags.exists(id)) {
-			d = this.drags.get(id);
+		if (this.trails.exists(id)) {
+			d = this.trails.get(id);
 		} else {
 			d = new Array<PointVDebug>();
-			this.drags.set(id, d);
+			this.trails.set(id, d);
 		}
 
 		if (d.length > buffersize) {
@@ -62,7 +65,7 @@ class VDebugImpl extends iron.Trait implements IVDebug {
 		d.push(point);
 	}
 
-	public function addPoint(a:Vec4, color:Color, strength:Float) {
+	public function point(a:Vec4, color:Color, strength:Float) {
 		var point = new PointVDebug();
 		point.a = a.clone();
 		point.color = color;
@@ -70,23 +73,47 @@ class VDebugImpl extends iron.Trait implements IVDebug {
 		this.points.push(point);
 	}
 
-	public function addVariable(key:String, value:String):Void {
+	public function variable(key:String, value:Dynamic):Void {
 		this.messages.push(key + ": " + value);
 	}
 
-	public function addMessage(message:String):Void {
+	public function message(message:String):Void {
 		this.messages.push(message);
 	}
 
-	public function onRender(g:kha.graphics2.Graphics) {
+	public function time(id:String):Void {
+		stopwatches.set(id, new StopwatchVDebug());
+	}
 
-		for (i in this.drags.keys()) {
-			for (point in this.drags[i]) {
+	public function timeEnd(id:String):Void {
+		if (stopwatches.exists(id)) {
+			this.variable(id, stopwatches.get(id).elapsedMillisecond() + "ms");
+			stopwatches.remove(id);
+		} else {
+			trace("[Warning, VDebug] call .time(id) before timeEnd(id)");
+		}
+	}
+
+	public function cost(id:String) {
+		if (stopwatches.exists(id)) {
+			var total =stopwatches.get(id).elapsedMillisecond();
+			if (costs.exists(id)) {
+				total += costs.get(id);	
+			}
+			costs.set(id, total);
+			stopwatches.remove(id);
+		} else {
+			trace("[Warning, VDebug] call .time(id) before cost(id)");
+		}
+	}
+
+	public function onRender(g:kha.graphics2.Graphics) {
+		for (i in this.trails.keys()) {
+			for (point in this.trails[i]) {
 				var aScreen = WorldToScreen(point.a);
 				g.color = point.color;
 				GraphicsExtension.fillCircle(g, aScreen.x, aScreen.y, point.strength);
 			}
-			//this.drags[i].shift();
 		}
 
 		while (this.lines.length > 0) {
@@ -107,6 +134,12 @@ class VDebugImpl extends iron.Trait implements IVDebug {
 			g.color = point.color;
 			GraphicsExtension.fillCircle(g, aScreen.x, aScreen.y, point.strength);
 		}
+
+		for (k in this.costs.keys()) {
+			var v = this.costs.get(k);
+			this.variable(k, v + "ms/frame"); // todo trace calls
+		}
+		 this.costs = new Map<String, Float>();
 
 		this.drawTextCall(g);
 	}

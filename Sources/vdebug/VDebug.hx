@@ -8,35 +8,38 @@ import vdebug.IVDebug;
 import iron.App;
 
 class VDebug {
-	private static var _instance:VDebugImpl;
+	public static var instance:IVDebug = new VDebugImpl(); //# <-- you could inject your implementation
 
-	public static function getInstance():IVDebug {
-		if (_instance == null) {
-			_instance = new VDebugImpl();
-			App.notifyOnRender2D(_instance.onRender);
-		}
-
-		return _instance;
-	};
-
-	public static function addLine(a:Vec4, b:Vec4, color:Color, strength:Float):Void {
-		getInstance().addLine(a, b, color, strength);
+	public static function line(a:Vec4, b:Vec4, color:Color, strength:Float):Void {
+		instance.line(a, b, color, strength);
 	}
 
-	public static function addPoint(a:Vec4, color:Color, strength:Float):Void {
-		getInstance().addPoint(a, color, strength);
+	public static function point(a:Vec4, color:Color, strength:Float):Void {
+		instance.point(a, color, strength);
 	}
 
-	public static function addVariable(key:String, value:String):Void {
-		getInstance().addVariable(key, value);
+	public static function variable(key:String, value:Dynamic):Void {
+		instance.variable(key,  value);
 	}
 
-	public static function addMessage(message:String):Void {
-		getInstance().addMessage(message);
+	public static function message(message:String):Void {
+		instance.message(message);
 	}
 
-	public static function addDrag(a:Vec4, color:Color, strength:Float, id:String, buffersize:Int) {
-		getInstance().addDrag(a, color, strength, id, buffersize);
+	public static function trail(a:Vec4, color:Color, strength:Float, id:String, buffersize:Int) {
+		instance.trail(a, color, strength, id, buffersize);
+	}
+
+	public static function time(id:String){
+		instance.time(id);
+	}
+
+	public static function timeEnd(id:String){
+		instance.timeEnd(id);
+	}
+
+	public static function cost(id:String){
+		instance.cost(id);
 	}
 }
 #end
