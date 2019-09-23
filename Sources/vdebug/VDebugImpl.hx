@@ -137,7 +137,7 @@ class VDebugImpl extends iron.Trait implements IVDebug {
 
 		for (k in this.costs.keys()) {
 			var v = this.costs.get(k);
-			this.variable(k, v + "ms/frame"); // todo trace calls
+			this.variable(k, Math.round(v*1000) + "ms/frame " + Math.round(1/v) + "Hz"); // todo trace calls
 		}
 		 this.costs = new Map<String, Float>();
 
