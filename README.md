@@ -7,8 +7,14 @@ Library to debug in `Armory3D` / `Iron`. You can draw your debug infos on the sc
 
 - Locate the `.blend` file you are working with
 - Create `Libraries` folder alongside your `.blend` file
-- Clone this repository using `git clone https://github.com/armory3d/armory3D-VDebug` into `Libraries` folder
+- Clone this repository using `git clone https://github.com/armory3d/armory3D-VDebug.git` into `Libraries` folder
 - Restart Blender and load your `.blend`
+
+Or in your git repository:
+```bash
+mkdir /Libraries/
+git submodule add https://github.com/marcgardent/armory3D-VDebug.git Libraries/vdebug
+```
 
 ## Usage
 
