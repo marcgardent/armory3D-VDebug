@@ -1,0 +1,12 @@
+{
+   "name": "vdebug",
+   "url": "https://github.com/marcgardent/armory3D-VDebug",
+   "license": "MIT",
+   "classPath": "Sources",
+   "tags": [],
+   "description": "Lib Armory3D to draw debug infos on the screen",
+   "contributors": ["marcgardent"],
+   "releasenote": "Added haxelib file",
+   "version": "1.0.0",
+   "dependencies": {}
+}
